@@ -1,0 +1,1 @@
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
