@@ -14,6 +14,7 @@ COPY requirements.txt requirements-test.txt /tmp/
 
 RUN /var/circleci/configure-postgres.sh && \
     /var/circleci/configure-redis.sh && \
-    /var/circleci/configure-courtlistener.sh
+    /var/circleci/configure-courtlistener.sh && \
+    /var/circleci/solr/configure-solr.sh
 
 ENTRYPOINT ["/var/circleci/activate.sh"]

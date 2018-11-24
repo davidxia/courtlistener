@@ -5,7 +5,7 @@
         "fields": {
             "username": "pandora",
             "first_name": "Dora with password 'password'",
-            "last_name": "☠☠☠☠☠☠☠☠☠☠☠",
+            "last_name": "last",
             "is_active": true,
             "is_superuser": false,
             "is_staff": false,

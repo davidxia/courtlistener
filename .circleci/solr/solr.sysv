@@ -1,0 +1,80 @@
+#!/bin/sh
+
+# This script will launch Solr in a mode that will automatically respawn if it
+# crashes. Output will be sent to /var/log/solr/solr.log. A pid file will be
+# created in the standard location.
+
+SOLR_XMX="500M"
+SOLR_LOG_DIR="/var/log/solr"
+SOLR_HOME="/opt/solr-cores"
+
+start () {
+    echo -n "Starting solr with heap size $SOLR_XMX..."
+
+    # Reset ulimit or else get issues with too many open files (https://issues.apache.org/jira/browse/SOLR-4)
+    ulimit -n 10000
+
+    # start daemon
+    daemon --chdir='/usr/local/solr/example' --command "java -Dsolr.install.dir=/usr/local/solr -Dsolr.solr.home=$SOLR_HOME -jar -server -Xmx$SOLR_XMX start.jar" --respawn --output=$SOLR_LOG_DIR/solr.log --name=solr --verbose
+
+    RETVAL=$?
+    if [ $RETVAL = 0 ]
+    then
+        echo "done."
+    else
+        echo "failed. See error code for more information."
+    fi
+    return $RETVAL
+}
+
+stop () {
+    # stop daemon
+    echo -n "Stopping solr..."
+
+    daemon --stop --name=solr  --verbose
+    RETVAL=$?
+
+    if [ $RETVAL = 0 ]
+    then
+        echo "done."
+    else
+        echo "failed. See error code for more information."
+    fi
+    return $RETVAL
+}
+
+
+restart () {
+    daemon --restart --name=solr  --verbose
+}
+
+
+status () {
+    # report on the status of the daemon
+    daemon --running --verbose --name=solr
+    return $?
+}
+
+
+case "$1" in
+    start)
+        start
+    ;;
+    status)
+        status
+    ;;
+    stop)
+        stop
+    ;;
+    restart)
+        stop
+        sleep 15
+        start
+    ;;
+    *)
+        echo $"Usage: solr {start|status|stop|restart}"
+        exit 3
+    ;;
+esac
+
+exit $RETVAL
